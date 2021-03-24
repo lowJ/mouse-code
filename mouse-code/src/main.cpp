@@ -24,10 +24,35 @@
 #define M2_ENC_A_PIN 7
 #define M2_ENC_B_PIN 6
 
+int enc_a_l_count = 0;
+int enc_b_l_count = 0;
+int enc_a_r_count = 0;
+int enc_b_r_count = 0;
+
 #define BUZZ_PIN 13
 #define SW_1_PIN 11
 #define SW_2_PIN 12
 #define RGB_DATA_PIN 10
+
+enum Direction{
+  FORWARDS = 0, BACKWARDS = 1, STOP = 2
+};
+
+void enc_a_l_intr_handler(){
+  enc_a_l_count++;
+}
+
+void enc_b_l_intr_handler(){
+  enc_b_l_count++;
+}
+
+void enc_a_r_intr_handler(){
+  enc_a_r_count++;
+}
+
+void enc_b_r_intr_handler(){
+  enc_b_r_count++;
+}
 
 
 void setup() {
@@ -44,20 +69,25 @@ void setup() {
   pinMode(M1_BACK_PIN, OUTPUT);
   pinMode(M1_FWD_PIN, OUTPUT);
   pinMode(M1_SPD_PIN, OUTPUT);
-  pinMode(M1_ENC_A_PIN, OUTPUT);
-  pinMode(M1_ENC_B_PIN, OUTPUT);
+  pinMode(M1_ENC_A_PIN, INPUT); //check if input pullup
+  pinMode(M1_ENC_B_PIN, INPUT);
 
   pinMode(M2_BACK_PIN, OUTPUT);
   pinMode(M2_FWD_PIN, OUTPUT);
   pinMode(M2_SPD_PIN, OUTPUT);
-  pinMode(M2_ENC_A_PIN, OUTPUT);
-  pinMode(M2_ENC_B_PIN, OUTPUT);
+  pinMode(M2_ENC_A_PIN, INPUT); //check if input pullup
+  pinMode(M2_ENC_B_PIN, INPUT);
 
   pinMode(BUZZ_PIN, OUTPUT);
   pinMode(SW_1_PIN, INPUT);
   pinMode(SW_2_PIN, INPUT);
   //pinMode(RGB_DATA_PIN, OUTPUT);
 
+  //Interrupts
+  attachInterrupt(M2_ENC_A_PIN, enc_a_l_intr_handler, RISING); //check if rising or falling
+  attachInterrupt(M2_ENC_B_PIN, enc_b_l_intr_handler, RISING);
+  attachInterrupt(M1_ENC_A_PIN, enc_a_r_intr_handler, RISING);
+  attachInterrupt(M1_ENC_B_PIN, enc_b_r_intr_handler, RISING);
 }
 
 
@@ -99,8 +129,66 @@ int get_dist_fl(){
 }
 
 
+void set_motor_l(Direction dir, int speed){
+  if(dir == 0){ //FWD
+    digitalWrite(M2_FWD_PIN, );
+    digitalWrite(M2_BACK_PIN, );
+    digitalWrite(M2_SPD_PIN, );
+  }
+  else if(dir == 1){ //BACK
+    digitalWrite(M2_FWD_PIN, );
+    digitalWrite(M2_BACK_PIN, );
+    digitalWrite(M2_SPD_PIN, );
+  }
+  else if(dir == 2){ //STOP
+    digitalWrite(M2_FWD_PIN, );
+    digitalWrite(M2_BACK_PIN, );
+    digitalWrite(M2_SPD_PIN, );
+  }
+  else{
+    //invalid direction given
+  }
+}
 
- 
+void set_motor_r(Direction dir, int speed){
+  if(dir == 0){ //FWD
+    digitalWrite(M1_FWD_PIN, );
+    digitalWrite(M1_BACK_PIN, );
+    digitalWrite(M1_SPD_PIN, );
+  }
+  else if(dir == 1){ //BACK
+    digitalWrite(M1_FWD_PIN, );
+    digitalWrite(M1_BACK_PIN, );
+    digitalWrite(M1_SPD_PIN, );
+  }
+  else if(dir == 2){ //STOP
+    digitalWrite(M1_FWD_PIN, );
+    digitalWrite(M1_BACK_PIN, );
+    digitalWrite(M1_SPD_PIN, );
+  }
+  else{
+    //invalid direction given
+  }
+}
+
+void rst_enc_a_l_count(){
+  enc_a_l_count = 0;
+}
+
+void rst_enc_b_l_count(){
+  enc_b_l_count = 0;
+}
+
+void rst_enc_a_r_count(){
+  enc_a_r_count = 0;
+}
+
+void rst_enc_b_r_count(){
+  enc_a_l_count = 0;
+}
+
+
+
 
 void loop() {
   // put your main code here, to run repeatedly:
