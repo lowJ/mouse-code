@@ -1,45 +1,15 @@
 #include <Arduino.h>
-
-#define EMITTER_ON_TIME 1
-
-#define EMIT_L_PIN 20 //D1
-#define EMIT_R_PIN 17 //D3
-#define EMIT_FL_PIN 22 //D0
-#define EMIT_FR_PIN 15 //D2
-
-#define RECIVER_L_PIN 21 //Q1
-#define RECIVER_R_PIN 16 //Q3
-#define RECIVER_FL_PIN 23 //Q0
-#define RECIVER_FR_PIN 14 //Q2
-
-#define WALL_L_THRESHOLD 00
-#define WALL_R_THRESHOLD 00 //figure out these
-
-#define M1_BACK_PIN 0
-#define M1_FWD_PIN 1
-#define M1_SPD_PIN 4
-#define M1_ENC_A_PIN 8
-#define M1_ENC_B_PIN 9
-
-#define M2_BACK_PIN 3
-#define M2_FWD_PIN 2
-#define M2_SPD_PIN 5
-#define M2_ENC_A_PIN 7
-#define M2_ENC_B_PIN 6
+#include "base_funcs.h"
 
 int enc_a_l_count = 0;
 int enc_b_l_count = 0;
 int enc_a_r_count = 0;
 int enc_b_r_count = 0;
 
-#define BUZZ_PIN 13
-#define SW_1_PIN 11
-#define SW_2_PIN 12
-#define RGB_DATA_PIN 10
 
-enum Direction{
-  FORWARDS = 0, BACKWARDS = 1, STOP = 2
-};
+// enum Direction{
+//   FORWARDS = 0, BACKWARDS = 1, STOP = 2
+// };
 
 void enc_a_l_intr_handler(){
   enc_a_l_count++;
@@ -57,12 +27,13 @@ void enc_b_r_intr_handler(){
   enc_b_r_count++;
 }
 
-
 void setup() {
+  Serial.begin(9600);             //USB serial
+  Serial7.begin(9600);            //Bluetooth module
   pinMode(EMIT_L_PIN, OUTPUT);
   pinMode(EMIT_R_PIN, OUTPUT);
   pinMode(EMIT_FL_PIN, OUTPUT);
-  pinMode(EMIT_FR_PIN,OUTPUT);
+  pinMode(EMIT_FR_PIN, OUTPUT);
 
   pinMode(RECIVER_L_PIN, INPUT);
   pinMode(RECIVER_R_PIN, INPUT);
@@ -72,147 +43,193 @@ void setup() {
   pinMode(M1_BACK_PIN, OUTPUT);
   pinMode(M1_FWD_PIN, OUTPUT);
   pinMode(M1_SPD_PIN, OUTPUT);
-  pinMode(M1_ENC_A_PIN, INPUT); //check if input pullup
+  pinMode(M1_ENC_A_PIN, INPUT);     //check if input pullup
   pinMode(M1_ENC_B_PIN, INPUT);
 
   pinMode(M2_BACK_PIN, OUTPUT);
   pinMode(M2_FWD_PIN, OUTPUT);
   pinMode(M2_SPD_PIN, OUTPUT);
-  pinMode(M2_ENC_A_PIN, INPUT); //check if input pullup
+  pinMode(M2_ENC_A_PIN, INPUT);     //check if input pullup
   pinMode(M2_ENC_B_PIN, INPUT);
 
   pinMode(BUZZ_PIN, OUTPUT);
-  pinMode(SW_1_PIN, INPUT);
-  pinMode(SW_2_PIN, INPUT);
-  //pinMode(RGB_DATA_PIN, OUTPUT);
+  pinMode(SW_1_PIN, INPUT_PULLUP);
+  pinMode(SW_2_PIN, INPUT_PULLUP);
+  pinMode(VOL_METER, INPUT);
+
+  analogWriteFrequency(M1_BACK_PIN, 488.28);
+  analogWriteFrequency(M1_FWD_PIN, 488.28);
+  analogWriteFrequency(M1_SPD_PIN, 488.28);
+  analogWriteFrequency(M2_BACK_PIN, 488.28);
+  analogWriteFrequency(M2_FWD_PIN, 488.28);
+  analogWriteFrequency(M2_SPD_PIN, 488.28);
+  analogWriteFrequency(BUZZ_PIN, 488.28);
 
   //Interrupts
-  attachInterrupt(M2_ENC_A_PIN, enc_a_l_intr_handler, RISING); //check if rising or falling
-  attachInterrupt(M2_ENC_B_PIN, enc_b_l_intr_handler, RISING);
-  attachInterrupt(M1_ENC_A_PIN, enc_a_r_intr_handler, RISING);
-  attachInterrupt(M1_ENC_B_PIN, enc_b_r_intr_handler, RISING);
-}
+  attachInterrupt(M2_ENC_A_PIN, enc_a_l_intr_handler, FALLING); //check if rising or falling
+  attachInterrupt(M2_ENC_B_PIN, enc_b_l_intr_handler, FALLING);
+  attachInterrupt(M1_ENC_A_PIN, enc_a_r_intr_handler, FALLING);
+  attachInterrupt(M1_ENC_B_PIN, enc_b_r_intr_handler, FALLING);
+  //attachInterrupt(SW_2_PIN, sw_2_handler, FALLING);
 
-
-//implement data averaging ??
-int get_dist_l(){
-  int dist;
-  digitalWrite(EMIT_L_PIN, HIGH);
-  delay(EMITTER_ON_TIME);
-  dist = analogRead(RECIVER_L_PIN);
-  digitalWrite(EMIT_L_PIN, LOW);
-  return dist;
-}
-
-int get_dist_r(){
-  int dist;
-  digitalWrite(EMIT_R_PIN, HIGH);
-  delay(EMITTER_ON_TIME);
-  dist = analogRead(RECIVER_R_PIN);
-  digitalWrite(EMIT_R_PIN, LOW);
-  return dist;
-}
-
-int get_dist_fr(){
-  int dist;
-  digitalWrite(EMIT_FR_PIN, HIGH);
-  delay(EMITTER_ON_TIME);
-  dist = analogRead(RECIVER_FR_PIN);
-  digitalWrite(EMIT_FR_PIN, LOW);
-  return dist;
-}
-
-int get_dist_fl(){
-  int dist;
-  digitalWrite(EMIT_FL_PIN, HIGH);
-  delay(EMITTER_ON_TIME);
-  dist = analogRead(RECIVER_FL_PIN);
-  digitalWrite(EMIT_FL_PIN, LOW);
-  return dist;
-}
-
-bool has_wall_l(){
-  int dist = get_dist_l();
-  if(dist <= WALL_L_THRESHOLD){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
-bool has_wall_r(){
-  int dist = get_dist_r();
-  if(dist <= WALL_R_THRESHOLD){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
-
-void set_motor_l(Direction dir, int speed){
-  if(dir == 0){ //FWD
-    digitalWrite(M2_FWD_PIN, );
-    digitalWrite(M2_BACK_PIN, );
-    digitalWrite(M2_SPD_PIN, );
-  }
-  else if(dir == 1){ //BACK
-    digitalWrite(M2_FWD_PIN, );
-    digitalWrite(M2_BACK_PIN, );
-    digitalWrite(M2_SPD_PIN, );
-  }
-  else if(dir == 2){ //STOP
-    digitalWrite(M2_FWD_PIN, );
-    digitalWrite(M2_BACK_PIN, );
-    digitalWrite(M2_SPD_PIN, );
-  }
-  else{
-    //invalid direction given
-  }
-}
-
-void set_motor_r(Direction dir, int speed){
-  if(dir == 0){ //FWD
-    digitalWrite(M1_FWD_PIN, );
-    digitalWrite(M1_BACK_PIN, );
-    digitalWrite(M1_SPD_PIN, );
-  }
-  else if(dir == 1){ //BACK
-    digitalWrite(M1_FWD_PIN, );
-    digitalWrite(M1_BACK_PIN, );
-    digitalWrite(M1_SPD_PIN, );
-  }
-  else if(dir == 2){ //STOP
-    digitalWrite(M1_FWD_PIN, );
-    digitalWrite(M1_BACK_PIN, );
-    digitalWrite(M1_SPD_PIN, );
-  }
-  else{
-    //invalid direction given
-  }
-}
-
-void rst_enc_a_l_count(){
-  enc_a_l_count = 0;
-}
-
-void rst_enc_b_l_count(){
-  enc_b_l_count = 0;
-}
-
-void rst_enc_a_r_count(){
-  enc_a_r_count = 0;
-}
-
-void rst_enc_b_r_count(){
-  enc_a_l_count = 0;
+  delay(2000);
 }
 
 
 
 
+
+
+
+#define UPPER_MOTOR_LIMIT 140
+#define LOWER_MOTOR_LIMIT 30
+#define PID_POLLING_DELAY 15
+#define MOTOR_SWITCH_DIR_DELAY 0
+
+//Need to test buzzer
+int buzz_freq;
+int last_spd;
 void loop() {
-  // put your main code here, to run repeatedly:
+  bt_write("Start Part 1");
+  yellow_led_on();
+  red_led_on();
+  green_led_on();
+  //turn_all_emit_on();
+  //turn_all_led_on();
+  //0 == fwd, 1 = back 2 = stop
+  //move forward for 2 seconds
+  set_motor_l(0, UPPER_MOTOR_LIMIT);
+  set_motor_r(0, UPPER_MOTOR_LIMIT);
+  //set_buzzer_on(500);
+  delay(5000);
+  //stop motors briefly
+  set_motor_l(2, 0);
+  set_motor_r(2, 0);
+  delay(MOTOR_SWITCH_DIR_DELAY);
+  //move motors backwards for 2 seconds
+  set_motor_l(1, UPPER_MOTOR_LIMIT);
+  set_motor_r(1, UPPER_MOTOR_LIMIT);
+  //set_buzzer_on(1000);
+  delay(5000);
+  //stop motors briefly
+  set_motor_l(2, 0);
+  set_motor_l(2, 0);
+  delay(MOTOR_SWITCH_DIR_DELAY);
+  //turn left for 2 seconds
+  set_motor_l(1, UPPER_MOTOR_LIMIT);
+  set_motor_r(0, UPPER_MOTOR_LIMIT);
+  //set_buzzer_on(2000);
+  delay(5000);
+  //stop motors briefly
+  set_motor_l(2, 0);
+  set_motor_r(2, 0);
+  delay(MOTOR_SWITCH_DIR_DELAY);
+  //turn right for 2 seconds
+  set_motor_l(0, UPPER_MOTOR_LIMIT);
+  set_motor_r(1, UPPER_MOTOR_LIMIT);
+  //set_buzzer_on(5000);
+  delay(5000);
+  //stop motors briefly
+  set_motor_l(2, 0);
+  set_motor_r(2, 0);
+  delay(MOTOR_SWITCH_DIR_DELAY);
+  bt_write("Start Part 2");
+  //Test incrementing/decrementing motor speeds
+  //increment the motor speed from 0 to UPPER_MOTOR_LIMIT, then decrement it to 0
+  turn_all_emit_off();
+  turn_all_led_off();
+  yellow_led_off();
+  red_led_off();
+  green_led_off();
+  set_buzzer_off();
+  last_spd = 0;
+  for (int i = 0; i < 5; i ++) { //repeat the sequence below 5 times
+    //increment speed by 1
+    for (last_spd = 0; last_spd < UPPER_MOTOR_LIMIT; last_spd++) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      //set_buzzer_on(7000);
+      delay(PID_POLLING_DELAY);
+    }
+    //decrement speed by 1
+    for (last_spd = UPPER_MOTOR_LIMIT; last_spd > 1; last_spd--) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      //set_buzzer_on(10000);
+      delay(PID_POLLING_DELAY);
+    }
+    //increment speed by 3
+    for (last_spd = 0; last_spd < UPPER_MOTOR_LIMIT; last_spd += 3) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      //set_buzzer_on(12000);
+      delay(PID_POLLING_DELAY);
+    }
+    //decrement speed by 3
+    for (last_spd = UPPER_MOTOR_LIMIT; last_spd > 1; last_spd -= 3) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      //set_buzzer_on(15000);
+      delay(PID_POLLING_DELAY);
+    }
+    //increment speed by 7
+    for (last_spd = 0; last_spd < UPPER_MOTOR_LIMIT; last_spd += 7) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      delay(PID_POLLING_DELAY);
+    }
+    //decrement speed by 7
+    for (last_spd = UPPER_MOTOR_LIMIT; last_spd > 1; last_spd -= 7) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      delay(PID_POLLING_DELAY);
+    }
+    //increment speed by 15
+    for (last_spd = 0; last_spd < UPPER_MOTOR_LIMIT; last_spd += 15) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      delay(PID_POLLING_DELAY);
+    }
+    //decrement speed by 15
+    for (last_spd = UPPER_MOTOR_LIMIT; last_spd > 1; last_spd -= 15) {
+      set_motor_l(0, last_spd);
+      set_motor_r(0, last_spd);
+      get_dist_r();
+      get_dist_l();
+      delay(PID_POLLING_DELAY);
+    }
+  }
+
+  set_motor_l(2, 0);
+  set_motor_r(2, 0);
+
+  bt_write("Vol meter: ");
+  bt_write(read_battery());
+
+
+  //Serial.println(get_dist_l());
+
+  //Serial.println(get_dist_r());
+
+
+  //Serial.println(get_dist_fr());
+
+  //Serial.println(get_dist_fl());
+  //set_buzzer_on();
+  //Serial.println(read_battery());
+  //delay(1000);
 }
