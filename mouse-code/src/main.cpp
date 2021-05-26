@@ -12,6 +12,9 @@
 #define RECIVER_FL_PIN 23 //Q0
 #define RECIVER_FR_PIN 14 //Q2
 
+#define WALL_L_THRESHOLD 00
+#define WALL_R_THRESHOLD 00 //figure out these
+
 #define M1_BACK_PIN 0
 #define M1_FWD_PIN 1
 #define M1_SPD_PIN 4
@@ -126,6 +129,26 @@ int get_dist_fl(){
   dist = analogRead(RECIVER_FL_PIN);
   digitalWrite(EMIT_FL_PIN, LOW);
   return dist;
+}
+
+bool has_wall_l(){
+  int dist = get_dist_l();
+  if(dist <= WALL_L_THRESHOLD){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+bool has_wall_r(){
+  int dist = get_dist_r();
+  if(dist <= WALL_R_THRESHOLD){
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
 
