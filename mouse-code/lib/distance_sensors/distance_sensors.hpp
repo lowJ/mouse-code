@@ -12,9 +12,7 @@
 #define RECIVER_FR_PIN 14 //Q2
 
 //static calibration ints
-//constant detect wall threshold
-void dist_calibrate_sensors()
-
+//constant detect wall threshold:
 int dist_l();
 int dist_r();
 int dist_fr();
@@ -22,4 +20,12 @@ int dist_fl();
 
 bool dist_front_open();
 bool dist_left_open();
-bool dist_right__pen();
+bool dist_right_open();
+// int dist_l();
+// int dist_r();
+// int dist_fr();
+// int dist_fl();
+
+// bool dist_front_open();
+// bool dist_left_open();
+// bool dist_right_open();
