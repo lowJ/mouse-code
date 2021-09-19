@@ -18,14 +18,5 @@ int dist_r();
 int dist_fr();
 int dist_fl();
 
-bool dist_front_open();
-bool dist_left_open();
-bool dist_right_open();
-// int dist_l();
-// int dist_r();
-// int dist_fr();
-// int dist_fl();
 
-// bool dist_front_open();
-// bool dist_left_open();
-// bool dist_right_open();
+void dist_print_values();

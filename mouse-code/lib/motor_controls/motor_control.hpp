@@ -20,7 +20,7 @@ typedef enum Direction {
     STOP
 } Direction;
 
-void set_motor_l(Direction dir, int speed);
-void set_motor_r(Direction dir, int speed);
+void set_motor_l(Direction dir, float speed);
+void set_motor_r(Direction dir, float speed);
 
 //make sure to implement rnage checking for values

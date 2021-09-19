@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <motor_control.hpp>
-void set_motor_l(Direction dir, int speed) {
+void set_motor_r(Direction dir, float speed) {
     if (dir == FORWARD) {
         digitalWrite(M2_FWD_PIN, LOW);
         digitalWrite(M2_BACK_PIN, HIGH);
@@ -18,7 +18,7 @@ void set_motor_l(Direction dir, int speed) {
     }
 }
 
-void set_motor_r(Direction dir, int speed) {
+void set_motor_l(Direction dir, float speed) {
     if (dir == FORWARD) {
         digitalWrite(M1_BACK_PIN, LOW);
         digitalWrite(M1_FWD_PIN, HIGH);

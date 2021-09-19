@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <distance_sensors.hpp>
-
 int dist_l() {
   int dist;
   digitalWrite(EMIT_L_PIN, HIGH);
@@ -49,4 +48,15 @@ void turn_all_emit_off() {
   digitalWrite(EMIT_FR_PIN, LOW);
   digitalWrite(EMIT_R_PIN, LOW);
   digitalWrite(EMIT_L_PIN, LOW);
+}
+
+void dist_print_values() {
+    Serial.print("FL: ");
+    Serial.println(dist_fl());
+    Serial.print("FR: ");
+    Serial.println(dist_fr());
+    Serial.print("L: ");
+    Serial.println(dist_l());
+    Serial.print("R: ");
+    Serial.println(dist_r());
 }

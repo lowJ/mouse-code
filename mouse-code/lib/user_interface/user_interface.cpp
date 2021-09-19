@@ -2,6 +2,7 @@
 #include <user_interface.hpp>
 
 void set_buzzer_on(int freq) {
+    pinMode(BUZZ_PIN, OUTPUT);
   tone(BUZZ_PIN, freq);
   //analogWrite(BUZZ_PIN, 2);
   //draws about 0.8ma
@@ -9,7 +10,8 @@ void set_buzzer_on(int freq) {
 }
 
 void set_buzzer_off() {
-  tone(BUZZ_PIN,1);
+     pinMode(BUZZ_PIN, INPUT);
+    //tone(BUZZ_PIN,1);
 }
 
 void bt_write(String s) {
